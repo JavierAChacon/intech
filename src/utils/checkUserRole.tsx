@@ -14,7 +14,7 @@ const checkUserRole = async (navigate: NavigateFunction): Promise<void> => {
     }
 
     const { data: roleData, error: roleError } = await supabase
-      .from("roles")
+      .from("role")
       .select("role")
       .eq("id", user.id)
       .single()

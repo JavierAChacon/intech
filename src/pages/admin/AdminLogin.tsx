@@ -36,7 +36,6 @@ const AdminLogin = () => {
         })
 
       if (authError) {
-        console.log(authError)
         setError("root.serverError", {
           type: authError.code,
           message: authError.message
@@ -46,8 +45,8 @@ const AdminLogin = () => {
 
       const userId = authData.user.id
 
-      const { data: roleData, error: roleError } = await supabase
-        .from("roles")
+      const { data: dataRole, error: roleError } = await supabase
+        .from("role")
         .select("role")
         .eq("id", userId)
         .single()
@@ -60,7 +59,7 @@ const AdminLogin = () => {
         return
       }
 
-      const { role } = roleData
+      const { role } = dataRole
 
       if (role === "Admin") {
         navigate("/admin")
@@ -73,7 +72,7 @@ const AdminLogin = () => {
     } catch {
       setError("root.serverError", {
         type: "500",
-        message: "Ocurrió un error inesperado."
+        message: "An unexpected error has occurred"
       })
     }
   }
@@ -82,7 +81,7 @@ const AdminLogin = () => {
     <div className="flex h-dvh items-center justify-center bg-gray-300">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col items-center gap-y-3 rounded-3xl bg-white p-3 shadow-2xl w-60"
+        className="flex w-60 flex-col items-center gap-y-3 rounded-3xl bg-white p-3 shadow-2xl"
       >
         {/* Mostrar error general */}
         {errors.root?.serverError && (
