@@ -1,8 +1,16 @@
-
-const Layout = () => {
+import { Outlet } from "react-router-dom"
+import NavigationBar from "./NavigationBar"
+import ClientFooter from "./ClientFooter"
+const ClientLayout = () => {
   return (
-    <div></div>
+    <>
+      <NavigationBar />
+      <main>
+        <Outlet />
+      </main>
+      <ClientFooter />
+    </>
   )
 }
 
-export default Layout
+export default ClientLayout

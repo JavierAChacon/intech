@@ -4,13 +4,16 @@ import AdminLayout from "./components/admin/AdminLayout"
 import AddLaptop from "./pages/admin/AddLaptop"
 import Index from "./pages/admin/Index"
 import AdminLogin from "./pages/admin/AdminLogin"
+import ClientLayout from "./components/client/ClientLayout"
+import Laptop from "./pages/client/Laptop"
 
 function App() {
   return (
     <Routes>
       {/* Client */}
-      <Route>
+      <Route element={<ClientLayout />}>
         <Route index element={<Home />} />
+        <Route path="/laptop/:id" element={<Laptop/>} />
       </Route>
 
       {/* Admin */}
