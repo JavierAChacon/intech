@@ -118,7 +118,7 @@ const Home = () => {
             </div>
 
             <div>
-              <img src={macbook} alt="Macbook" className="w-[35rem]"/>
+              <img src={macbook} alt="Macbook" className="w-[35rem]" />
             </div>
           </div>
         )}
@@ -131,8 +131,9 @@ const Home = () => {
         <div className="no-scrollbar overflow-x-scroll">
           {laptops.length > 0 ? (
             laptops.map((laptop) => (
-              <Link to={`/laptop/${laptop.id}`}
-                className="flex h-36 w-36 flex-col items-center justify-center rounded-2xl bg-white text-center mb-3"
+              <Link
+                to={`/laptop/${laptop.id}`}
+                className="mb-3 flex h-36 w-36 flex-col items-center justify-center rounded-2xl bg-white text-center"
                 key={laptop.id}
               >
                 <div>

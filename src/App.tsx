@@ -13,7 +13,7 @@ function App() {
       {/* Client */}
       <Route element={<ClientLayout />}>
         <Route index element={<Home />} />
-        <Route path="/laptop/:id" element={<Laptop/>} />
+        <Route path="/laptop/:id" element={<Laptop />} />
       </Route>
 
       {/* Admin */}

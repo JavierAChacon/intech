@@ -98,7 +98,7 @@ const ClientFooter = () => {
         <FaTwitter className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
       </div>
 
-      <div className="w-fit mx-auto mt-3">
+      <div className="mx-auto mt-3 w-fit">
         <img src={onclik} alt="onclik logo" />
       </div>
     </footer>

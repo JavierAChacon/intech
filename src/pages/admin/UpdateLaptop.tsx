@@ -1,8 +1,5 @@
-
 const UpdateLaptop = () => {
-  return (
-    <div>UpdateLaptop</div>
-  )
+  return <div>UpdateLaptop</div>
 }
 
 export default UpdateLaptop

@@ -28,7 +28,7 @@ const NavigationBar = () => {
   return (
     <header>
       <nav>
-        <div className="flex items-center py-3 border border-b-blue-main md:border-0">
+        <div className="flex items-center border border-b-blue-main py-3 md:border-0">
           <div className="ml-2 flex items-center">
             <Link to="/">
               <img src={logo} alt="intech" className="md:h-5" />
@@ -73,7 +73,7 @@ const NavigationBar = () => {
           </div>
         </div>
 
-        <div className="mx-auto flex justify-between border-t border-blue-main px-[15%] pt-2 text-blue-main max-md:hidden ">
+        <div className="mx-auto flex justify-between border-t border-blue-main px-[15%] pt-2 text-blue-main max-md:hidden">
           <Link to="/">Shop by category</Link>
 
           <Link to="/">Brands</Link>

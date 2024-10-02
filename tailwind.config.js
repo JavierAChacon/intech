@@ -6,7 +6,7 @@ export default {
       colors: {
         "blue-main": "#223fc7",
         "orange-main": "#ffac1a",
-        "navy": "#16243f"
+        navy: "#16243f"
       },
       fontFamily: {
         baloo: ['"Baloo 2"', "sans-serif"]
