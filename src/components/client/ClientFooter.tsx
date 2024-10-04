@@ -39,10 +39,10 @@ const ClientFooter = () => {
 
   return (
     <footer className="bg-navy p-4 font-baloo text-white">
-      <div className="flex flex-col justify-center gap-y-3 border-b border-b-white px-[10%] pb-4">
+      <div className="flex flex-col justify-center gap-y-3 border-b border-b-white px-[10%] pb-4 md:flex-row md:justify-between">
         {Object.entries(clientServices).map(([key, value]) => {
           return (
-            <div className="flex items-center">
+            <div className="flex items-center md:justify-center">
               <div className="w-16">
                 <img
                   src={clientServicesIcons?.[key]}
@@ -56,15 +56,15 @@ const ClientFooter = () => {
         })}
       </div>
 
-      <div className="mt-3 grid grid-cols-2 grid-rows-2 gap-4">
-        <div className="col-span-1 row-span-1 flex flex-col gap-y-2">
+      <div className="mt-3 grid grid-cols-2 grid-rows-2 gap-4 md:grid-cols-3 md:grid-rows-1">
+        <div className="col-span-1 row-span-1 flex flex-col gap-y-2 md:mx-auto md:w-fit">
           <h4 className="font-semibold">Order and Purcharses</h4>
           <p>Returns and Exchanges</p>
           <p>Check Order Status</p>
           <p>Giftcard</p>
         </div>
 
-        <div className="col-span-1 row-span-1 flex flex-col gap-y-2">
+        <div className="col-span-1 row-span-1 flex flex-col gap-y-2 md:mx-auto md:w-fit">
           <h4 className="font-semibold">Help</h4>
           <p>Support Center</p>
           <p>Shop with an Expert</p>
@@ -72,13 +72,13 @@ const ClientFooter = () => {
           <p>Contact us</p>
         </div>
 
-        <div className="col-span-2">
-          <h4 className="mb-4 text-center font-semibold underline">
+        <div className="col-span-2 md:col-span-1 md:mx-auto md:w-fit">
+          <h4 className="mb-4 text-center font-semibold underline md:text-left md:no-underline">
             Sign Up or Create an Account
           </h4>
 
           <div>
-            <label className="ml-[5%] font-bold">
+            <label className="ml-[5%] font-bold md:ml-0">
               Sign Up for Intech Emails
             </label>
             <input
@@ -90,7 +90,7 @@ const ClientFooter = () => {
         </div>
       </div>
       {/* Social media section */}
-      <div className="mx-auto flex w-[70%] max-w-96 justify-between">
+      <div className="mx-auto flex w-[70%] max-w-96 justify-between md:mb-5 md:mt-9">
         <FaInstagram className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
         <FaFacebook className="text-4xl" />
         <FaTiktok className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
