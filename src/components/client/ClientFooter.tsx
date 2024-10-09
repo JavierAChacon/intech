@@ -72,13 +72,13 @@ const ClientFooter = () => {
           <p>Contact us</p>
         </div>
 
-        <div className="col-span-2 md:col-span-1 md:mx-auto md:w-fit">
+        <div className="col-span-2 md:col-span-1 md:mx-auto">
           <h4 className="mb-4 text-center font-semibold underline md:text-left md:no-underline">
             Sign Up or Create an Account
           </h4>
 
           <div>
-            <label className="ml-[5%] font-bold md:ml-0">
+            <label className="ml-[5%] font-bold md:ml-0 lg:mt-4">
               Sign Up for Intech Emails
             </label>
             <input
@@ -87,15 +87,15 @@ const ClientFooter = () => {
               placeholder="Enter your email address"
             />
           </div>
+
+          <div className="mx-auto mt-9 flex w-[70%] max-w-96 justify-between">
+            <FaInstagram className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
+            <FaFacebook className="text-4xl" />
+            <FaTiktok className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
+            <FaYoutube className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
+            <FaTwitter className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
+          </div>
         </div>
-      </div>
-      {/* Social media section */}
-      <div className="mx-auto flex w-[70%] max-w-96 justify-between md:mb-5 md:mt-9">
-        <FaInstagram className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
-        <FaFacebook className="text-4xl" />
-        <FaTiktok className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
-        <FaYoutube className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
-        <FaTwitter className="h-[2.25rem] w-[2.25rem] rounded-full bg-white p-1 text-navy" />
       </div>
 
       <div className="mx-auto mt-3 w-fit">
