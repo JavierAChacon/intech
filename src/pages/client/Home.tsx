@@ -151,7 +151,7 @@ const Home = () => {
       </section>
 
       <section className="mx-auto w-96 max-w-[95%] md:grid md:w-[95%] md:grid-cols-12 md:grid-rows-4">
-        <div className="mx-auto mt-4 w-[22rem] rounded-2xl bg-gray-300 p-2 text-center md:col-span-7 md:row-span-3 md:flex md:w-[70%] md:flex-col md:items-center md:justify-center">
+        <div className="mx-auto mt-4 w-[22rem] rounded-2xl bg-gray-300 p-2 text-center md:col-span-6 md:row-span-3 md:flex md:w-[70%] md:flex-col md:items-center md:justify-center">
           <h3 className="text-2xl font-bold md:text-4xl lg:mt-3">
             Need Some Guidance?
           </h3>
@@ -207,7 +207,7 @@ const Home = () => {
           </button>
         </div>
 
-        <div className="md:col-span-7 md:row-span-1 md:my-auto">
+        <div className="md:col-span-6 md:row-span-1 md:my-auto">
           <h4 className="mb-1 mt-5 text-center text-xl font-extrabold md:my-4 md:text-2xl">
             Fast, Reliable Delivery
           </h4>
