@@ -144,8 +144,6 @@ const Home = () => {
                 <div className="min-h-36 w-36 min-w-36 flex-grow animate-pulse rounded-2xl bg-gray-300 md:h-36 md:w-36" />
                 <div className="min-h-36 w-36 min-w-36 flex-grow animate-pulse rounded-2xl bg-gray-300 md:h-36 md:w-36" />
                 <div className="min-h-36 w-36 min-w-36 flex-grow animate-pulse rounded-2xl bg-gray-300 md:h-36 md:w-36" />
-                <div className="min-h-36 w-36 min-w-36 flex-grow animate-pulse rounded-2xl bg-gray-300 md:h-36 md:w-36" />
-                <div className="min-h-36 w-36 min-w-36 flex-grow animate-pulse rounded-2xl bg-gray-300 md:h-36 md:w-36" />
               </div>
             )}
           </div>
