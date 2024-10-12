@@ -4,19 +4,29 @@ export interface LaptopInformation {
   brand: string
   model: string
   description: string
-  price: string
-  graphicCards: { brand: string; model: string }[] | null
-  processors: { brand: string; model: string }[] | null
-  rams: { capacity: number }[] | null
-  screens: { size: number }[] | null
-  storages: { capacity: number; capacity_unit: string; type: string }[] | null
+  price: number
+  graphicCards:
+    | { brand: string; model: string; price_adjustment: number }[]
+    | null
+  processors:
+    | { brand: string; model: string; price_adjustment: number }[]
+    | null
+  rams: { capacity: number; price_adjustment: number }[] | null
+  screens: { size: number; price_adjustment: number }[] | null
+  storages:
+    | {
+        capacity: number
+        capacity_unit: string
+        type: string
+        price_adjustment: number
+      }[]
+    | null
   images: string[] | null
 }
 
 const fetchLaptop = async (
   laptopId: string
 ): Promise<LaptopInformation | null> => {
-  // Fetch laptop basic information
   const { data: laptopData, error: laptopError } = await supabase
     .from("laptop")
     .select("*")
@@ -28,81 +38,90 @@ const fetchLaptop = async (
     return null
   }
 
-  // Desestructurar los campos específicos de laptopData
   const { brand, model, description, price } = laptopData
 
-  // Fetch relations (IDs) for each component
   const { data: graphicCardIds, error: graphicCardRelationError } =
     await supabase
       .from("laptop_graphic_card")
-      .select("graphic_card_id")
+      .select("graphic_card_id, price_adjustment")
       .eq("laptop_id", laptopId)
   if (graphicCardRelationError)
     console.error("Error fetching graphic card IDs:", graphicCardRelationError)
 
   const { data: processorIds, error: processorRelationError } = await supabase
     .from("laptop_processor")
-    .select("processor_id")
+    .select("processor_id, price_adjustment")
     .eq("laptop_id", laptopId)
   if (processorRelationError)
     console.error("Error fetching processor IDs:", processorRelationError)
 
   const { data: ramIds, error: ramRelationError } = await supabase
     .from("laptop_ram")
-    .select("ram_id")
+    .select("ram_id, price_adjustment")
     .eq("laptop_id", laptopId)
   if (ramRelationError)
     console.error("Error fetching RAM IDs:", ramRelationError)
 
   const { data: screenIds, error: screenRelationError } = await supabase
     .from("laptop_screen")
-    .select("screen_id")
+    .select("screen_id, price_adjustment")
     .eq("laptop_id", laptopId)
   if (screenRelationError)
     console.error("Error fetching screen IDs:", screenRelationError)
 
   const { data: storageIds, error: storageRelationError } = await supabase
     .from("laptop_storage")
-    .select("storage_id")
+    .select("storage_id, price_adjustment")
     .eq("laptop_id", laptopId)
   if (storageRelationError)
     console.error("Error fetching storage IDs:", storageRelationError)
 
-  // Fetching each component information
-
-  // Fetch Graphic Cards
   const graphicCards =
     graphicCardIds && graphicCardIds.length > 0
       ? await Promise.all(
-          graphicCardIds.map(async (item: { graphic_card_id: string }) => {
-            const { data: graphicCard, error: graphicCardError } =
-              await supabase
-                .from("graphic_card")
-                .select("brand, model")
-                .eq("id", item.graphic_card_id)
+          graphicCardIds.map(
+            async (item: { graphic_card_id: string }, index) => {
+              const { data: graphicCard, error: graphicCardError } =
+                await supabase
+                  .from("graphic_card")
+                  .select("brand, model")
+                  .eq("id", item.graphic_card_id)
 
-            if (graphicCardError || !graphicCard || graphicCard.length === 0) {
-              console.error(
-                `Error fetching graphic card with id ${item.graphic_card_id}:`,
-                graphicCardError
-              )
-              return null
+              if (
+                graphicCardError ||
+                !graphicCard ||
+                graphicCard.length === 0
+              ) {
+                console.error(
+                  `Error fetching graphic card with id ${item.graphic_card_id}:`,
+                  graphicCardError
+                )
+                return null
+              }
+
+              return {
+                ...graphicCard[0],
+                price_adjustment: graphicCardIds[index].price_adjustment
+              }
             }
-
-            return graphicCard[0]
-          })
+          )
         ).then((results) =>
           results.filter(
-            (item): item is { brand: string; model: string } => item !== null
+            (
+              item
+            ): item is {
+              brand: string
+              model: string
+              price_adjustment: number
+            } => item !== null
           )
         )
       : null
 
-  // Fetch Processors
   const processors =
     processorIds && processorIds.length > 0
       ? await Promise.all(
-          processorIds.map(async (item: { processor_id: string }) => {
+          processorIds.map(async (item: { processor_id: string }, index) => {
             const { data: processor, error: processorError } = await supabase
               .from("processor")
               .select("brand, model")
@@ -116,20 +135,28 @@ const fetchLaptop = async (
               return null
             }
 
-            return processor[0]
+            return {
+              ...processor[0],
+              price_adjustment: processorIds[index].price_adjustment
+            }
           })
         ).then((results) =>
           results.filter(
-            (item): item is { brand: string; model: string } => item !== null
+            (
+              item
+            ): item is {
+              brand: string
+              model: string
+              price_adjustment: number
+            } => item !== null
           )
         )
       : null
 
-  // Fetch RAMs
   const rams =
     ramIds && ramIds.length > 0
       ? await Promise.all(
-          ramIds.map(async (item: { ram_id: string }) => {
+          ramIds.map(async (item: { ram_id: string }, index) => {
             const { data: ram, error: ramError } = await supabase
               .from("ram")
               .select("capacity")
@@ -143,18 +170,23 @@ const fetchLaptop = async (
               return null
             }
 
-            return ram[0]
+            return {
+              ...ram[0],
+              price_adjustment: ramIds[index].price_adjustment
+            }
           })
         ).then((results) =>
-          results.filter((item): item is { capacity: number } => item !== null)
+          results.filter(
+            (item): item is { capacity: number; price_adjustment: number } =>
+              item !== null
+          )
         )
       : null
 
-  // Fetch Screens
   const screens =
     screenIds && screenIds.length > 0
       ? await Promise.all(
-          screenIds.map(async (item: { screen_id: string }) => {
+          screenIds.map(async (item: { screen_id: string }, index) => {
             const { data: screen, error: screenError } = await supabase
               .from("screen")
               .select("size")
@@ -168,18 +200,23 @@ const fetchLaptop = async (
               return null
             }
 
-            return screen[0]
+            return {
+              ...screen[0],
+              price_adjustment: screenIds[index].price_adjustment
+            }
           })
         ).then((results) =>
-          results.filter((item): item is { size: number } => item !== null)
+          results.filter(
+            (item): item is { size: number; price_adjustment: number } =>
+              item !== null
+          )
         )
       : null
 
-  // Fetch Storage
   const storages =
     storageIds && storageIds.length > 0
       ? await Promise.all(
-          storageIds.map(async (item: { storage_id: string }) => {
+          storageIds.map(async (item: { storage_id: string }, index) => {
             const { data: storage, error: storageError } = await supabase
               .from("storage")
               .select("capacity, capacity_unit, type")
@@ -193,7 +230,10 @@ const fetchLaptop = async (
               return null
             }
 
-            return storage[0]
+            return {
+              ...storage[0],
+              price_adjustment: storageIds[index].price_adjustment
+            }
           })
         ).then((results) =>
           results.filter(
@@ -203,15 +243,15 @@ const fetchLaptop = async (
               capacity: number
               capacity_unit: string
               type: string
+              price_adjustment: number
             } => item !== null
           )
         )
       : null
 
-  // Fetch Images from Supabase Storage (bucket 'laptops')
   const { data: imageFiles, error: imageError } = await supabase.storage
     .from("laptops")
-    .list(laptopId) // Fetch all files in the folder with the same id as the laptopId
+    .list(laptopId)
 
   if (imageError) {
     console.error("Error fetching images from storage:", imageError)
@@ -229,7 +269,6 @@ const fetchLaptop = async (
         )
       : null
 
-  // Compile the final object with all the laptop components
   const fetchedLaptop: LaptopInformation = {
     brand,
     model,

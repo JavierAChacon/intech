@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import fetchLaptop, { LaptopInformation } from "../../utils/fetchLaptop"
 import { useIsMobile } from "../../hooks/useIsMobile"
+import LaptopSkeleton from "../../components/client/LaptopSkeleton"
 
 const Laptop = () => {
   const [laptop, setLaptop] = useState<LaptopInformation | null>(null)
@@ -9,18 +10,17 @@ const Laptop = () => {
   const sliderRef = useRef<HTMLDivElement>(null)
   const { id } = useParams()
   const isMobile = useIsMobile()
+  const [laptopPrice, setLaptopPrice] = useState<number>(0)
   const [deliveryIcons, setDeliveryIcons] = useState<{ [key: string]: string }>(
     {}
   )
 
   // Components Selected
-  const [screenSelected, setScreenSelected] = useState<null | number>(null)
-  const [processorSelected, setProcessorSelected] = useState<null | string>(
-    null
-  )
-  const [ramSelected, setRamSelected] = useState<null | number>(null)
-  const [storageSelected, setStorageSelected] = useState<null | string>(null)
-  const [graphicCardSelected, setGraphicCard] = useState<null | string>(null)
+  const [screenSelected, setScreenSelected] = useState<number>(0)
+  const [processorSelected, setProcessorSelected] = useState<number>(0)
+  const [ramSelected, setRamSelected] = useState<number>(0)
+  const [storageSelected, setStorageSelected] = useState<number>(0)
+  const [graphicCardSelected, setGraphicCard] = useState<number | null>(null)
 
   // Delivery Selected
   const [deliverySelected, setDeliverySelected] = useState<null | string>(null)
@@ -45,25 +45,11 @@ const Laptop = () => {
                 fetchedLaptop.screens?.sort((a, b) => a.size - b.size) || [],
               rams:
                 fetchedLaptop.rams?.sort((a, b) => a.capacity - b.capacity) ||
-                [],
-              storages:
-                fetchedLaptop.storages?.sort(
-                  (a, b) => a.capacity - b.capacity
-                ) || []
+                []
             }
-
             setLaptop(sortedLaptop)
 
-            setScreenSelected(sortedLaptop.screens[0]?.size || null)
-            setProcessorSelected(sortedLaptop.processors?.[0]?.model || null)
-            setRamSelected(sortedLaptop.rams[0]?.capacity || null)
-            setStorageSelected(
-              sortedLaptop.storages[0]?.capacity.toString() || null
-            )
-            setGraphicCard(
-              sortedLaptop.graphicCards?.[0]?.model ||
-                "Integrated with the processor"
-            )
+            setLaptopPrice(sortedLaptop.price)
           }
         }
       } catch (err) {
@@ -124,309 +110,321 @@ const Laptop = () => {
     }
   }, [currentImage, laptop])
 
+  useEffect(() => {
+    if (laptop) {
+      const { screens, rams, storages, processors, graphicCards } = laptop
+
+      const screenPrice = screens?.[screenSelected]?.price_adjustment || 0
+      const ramPrice = rams?.[ramSelected]?.price_adjustment || 0
+      const storagePrice = storages?.[storageSelected]?.price_adjustment || 0
+      const processorPrice =
+        processors?.[processorSelected]?.price_adjustment || 0
+      const graphicCardPrice =
+        graphicCards?.[graphicCardSelected ?? 0]?.price_adjustment || 0
+
+      const totalPrice =
+        laptop.price +
+        screenPrice +
+        ramPrice +
+        storagePrice +
+        processorPrice +
+        graphicCardPrice
+
+      setLaptopPrice(totalPrice)
+    }
+  }, [
+    screenSelected,
+    processorSelected,
+    ramSelected,
+    storageSelected,
+    graphicCardSelected,
+    laptop
+  ])
+
   return (
     <div className="p-3 font-baloo font-medium leading-none">
-      {laptop && laptop.images && isMobile ? (
+      {laptop && laptop.images ? (
         <>
-          <section className="flex flex-col items-center">
-            <h1>
-              {laptop.brand} - {laptop.model} - {laptop.screens?.[0].size}" -{" "}
-              {laptop.processors?.[0].brand} {laptop.processors?.[0].model} with{" "}
-              {laptop.rams?.[0].capacity}GB Memory -{" "}
-              {laptop.storages?.[0].capacity}
-              {laptop.storages?.[0].capacity_unit} {laptop.storages?.[0].type}
-            </h1>
+          {isMobile ? (
+            <section className="flex w-full flex-col items-center">
+              <h1 className="text-justified">
+                {laptop.brand} - {laptop.model} - {laptop.screens?.[0].size}" -{" "}
+                {laptop.processors?.[0].brand} {laptop.processors?.[0].model}{" "}
+                with {laptop.rams?.[0].capacity}GB Memory -{" "}
+                {laptop.storages?.[0].capacity}
+                {laptop.storages?.[0].capacity_unit} {laptop.storages?.[0].type}
+              </h1>
 
-            {/* Images horizontal scroll */}
-            <div className="relative p-3">
-              <div
-                ref={sliderRef}
-                className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto scroll-smooth"
-              >
-                {laptop.images.map((image, index) => (
-                  <div key={index} className="min-w-full snap-center">
-                    <img
-                      src={image}
-                      alt={`Laptop ${index}`}
-                      className="mx-auto w-80"
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Navigation circles images */}
-              <div className="absolute bottom-0 mt-2 flex w-full justify-center gap-2">
-                {laptop.images.map((_, index) => (
-                  <div
-                    key={index}
-                    onClick={() => scrollToImage(index)} // Navegar a la imagen clickeada
-                    className={`h-2 w-2 cursor-pointer rounded-full transition-colors duration-300 ${
-                      index === currentImage ? "bg-blue-500" : "bg-gray-300"
-                    }`}
-                  ></div>
-                ))}
-              </div>
-            </div>
-
-            <div className="my-3 flex h-16 w-96 max-w-[95%] flex-col justify-center rounded-lg bg-[#d9e3f5] p-2 text-center">
-              <p className="text-2xl font-semibold leading-none">
-                ${laptop.price}
-                <br />
-                <span className="text-base font-normal">One-Time Payment</span>
-              </p>
-            </div>
-
-            <div className="mb-3 w-96 max-w-[95%] rounded-lg bg-[#d9e3f5] p-2 text-center">
-              <p className="text-2xl font-semibold leading-none">
-                ${(Number(laptop.price) / 6).toFixed(2)}
-                <br />
-                <span className="text-sm font-normal">
-                  Suggested Payments with 6-months Financing
-                </span>
-              </p>
-            </div>
-
-            <p className="my-3 text-sm font-normal leading-none">
-              {laptop.description}
-            </p>
-          </section>
-
-          {/* Customization Section */}
-          <section>
-            <h2 className="border-b border-b-blue-main px-4 py-1 text-lg font-semibold text-blue-main">
-              Customize
-            </h2>
-
-            {/* Screen Size Selection */}
-            <div className="mt-5 flex items-center gap-x-5">
-              <span>Screen size</span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {laptop
-                  .screens!.sort((a, b) => a.size - b.size)
-                  .map((screen) => (
-                    <button
-                      key={screen.size}
-                      onClick={() => setScreenSelected(screen.size)}
-                      className={`min-w-max rounded-lg border border-blue-main p-2 ${
-                        screenSelected === screen.size
-                          ? "bg-blue-main text-white"
-                          : "bg-white text-blue-main"
-                      }`}
-                    >
-                      {screen.size}"
-                    </button>
-                  ))}
-              </div>
-            </div>
-
-            {/* Processor Selection */}
-            <div className="mt-5 flex items-center gap-x-5">
-              <span>Processor</span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {laptop.processors!.map((processor) => (
-                  <button
-                    key={processor.model}
-                    onClick={() => setProcessorSelected(processor.model)}
-                    className={`min-w-max rounded-lg border border-blue-main p-2 ${
-                      processorSelected === processor.model
-                        ? "bg-blue-main text-white"
-                        : "bg-white text-blue-main"
-                    }`}
-                  >
-                    {processor.brand} {processor.model}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* RAM Selection */}
-            <div className="mt-5 flex items-center gap-x-5">
-              <span>RAM</span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {laptop.rams!.map((ram) => (
-                  <button
-                    key={ram.capacity}
-                    onClick={() => setRamSelected(ram.capacity)}
-                    className={`min-w-max rounded-lg border border-blue-main p-2 ${
-                      ramSelected === ram.capacity
-                        ? "bg-blue-main text-white"
-                        : "bg-white text-blue-main"
-                    }`}
-                  >
-                    {ram.capacity}GB
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Storage Selection */}
-            <div className="mt-5 flex items-center gap-x-5">
-              <span>Storage</span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {laptop.storages!.map((storage) => (
-                  <button
-                    key={storage.capacity}
-                    onClick={() =>
-                      setStorageSelected(storage.capacity.toString())
-                    }
-                    className={`min-w-max rounded-lg border border-blue-main p-2 ${
-                      storageSelected === storage.capacity.toString()
-                        ? "bg-blue-main text-white"
-                        : "bg-white text-blue-main"
-                    }`}
-                  >
-                    {storage.capacity}
-                    {storage.capacity_unit} {storage.type}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Graphic Card Selection */}
-            <div className="mt-5 flex items-center gap-x-5">
-              <span>Graphics</span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {laptop.graphicCards && laptop.graphicCards.length > 0 ? (
-                  laptop.graphicCards.map((graphicCard) => (
-                    <button
-                      key={graphicCard.model}
-                      onClick={() => setGraphicCard(graphicCard.model)}
-                      className={`min-w-max rounded-lg border border-blue-main p-2 ${
-                        graphicCardSelected === graphicCard.model
-                          ? "bg-blue-main text-white"
-                          : "bg-white text-blue-main"
-                      }`}
-                    >
-                      {graphicCard.brand} {graphicCard.model}
-                    </button>
-                  ))
-                ) : (
-                  <span>Integrated with the processor</span>
-                )}
-              </div>
-            </div>
-
-            {/* Delivery section */}
-            <div className="mx-auto my-5 flex w-[95%] max-w-[28rem] justify-center gap-x-2">
-              {Object.entries(deliveries).map(([key, value]) => {
-                return (
-                  <button
-                    onClick={() => setDeliverySelected(value)}
-                    key={key}
-                    className={`flex w-1/4 flex-col items-center justify-center gap-y-1 rounded-xl border border-blue-main p-1 ${deliverySelected === value ? "bg-blue-main text-white" : "bg-white text-blue-main"}`}
-                  >
-                    <div
-                      className={`flex items-center justify-center rounded-full bg-white p-2 ${deliverySelected === value ? "bg-blue-main text-white" : "bg-white text-blue-main"}`}
-                    >
-                      {value && (
-                        <img
-                          src={deliveryIcons[key]}
-                          alt={value}
-                          className="h-8"
-                        />
-                      )}
+              <div className="relative p-3">
+                <div
+                  ref={sliderRef}
+                  className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto scroll-smooth"
+                >
+                  {laptop.images.map((image, index) => (
+                    <div key={index} className="min-w-full snap-center">
+                      <img
+                        src={image}
+                        alt={`Laptop ${index}`}
+                        className="mx-auto w-80"
+                      />
                     </div>
-                    <p className="w-16 text-center text-sm leading-none">
-                      {value}
+                  ))}
+                </div>
+
+                <div className="absolute bottom-0 mt-2 flex w-full justify-center gap-2">
+                  {laptop.images.map((_, index) => (
+                    <div
+                      key={index}
+                      onClick={() => scrollToImage(index)}
+                      className={`h-2 w-2 cursor-pointer rounded-full transition-colors duration-300 ${
+                        index === currentImage ? "bg-blue-500" : "bg-gray-300"
+                      }`}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="my-3 flex h-16 w-96 max-w-[95%] flex-col justify-center rounded-lg bg-[#d9e3f5] p-2 text-center">
+                <p className="text-2xl font-semibold leading-none">
+                  ${laptopPrice}
+                  <br />
+                  <span className="text-base font-normal">
+                    One-Time Payment
+                  </span>
+                </p>
+              </div>
+
+              <div className="mb-3 w-96 max-w-[95%] rounded-lg bg-[#d9e3f5] p-2 text-center">
+                <p className="text-2xl font-semibold leading-none">
+                  ${(laptopPrice! / 6).toFixed(2)}
+                  <br />
+                  <span className="text-sm font-normal">
+                    Suggested Payments with 6-months Financing
+                  </span>
+                </p>
+              </div>
+
+              <p className="my-3 text-sm font-normal leading-none">
+                {laptop.description}
+              </p>
+            </section>
+          ) : (
+            <section className="flex items-center justify-center md:gap-x-10 lg:gap-x-20">
+              <div className="flex w-fit flex-col gap-y-4">
+                {laptop.images.map((image, index) => {
+                  return (
+                    <button
+                      key={image}
+                      onClick={() => setCurrentImage(index)}
+                      className="h-20 w-20 rounded-xl border bg-white p-1"
+                    >
+                      <img src={image} alt="image" />
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="h-auto bg-white md:w-[20rem] lg:w-[30rem]">
+                <img src={laptop.images[currentImage]} />
+              </div>
+
+              <div className="w-80">
+                <h1 className="text-justified">
+                  {laptop.brand} - {laptop.model} - {laptop.screens?.[0].size}"
+                  - {laptop.processors?.[0].brand}{" "}
+                  {laptop.processors?.[0].model} with{" "}
+                  {laptop.rams?.[0].capacity}GB Memory -{" "}
+                  {laptop.storages?.[0].capacity}
+                  {laptop.storages?.[0].capacity_unit}{" "}
+                  {laptop.storages?.[0].type}
+                </h1>
+
+                <div className="my-3 mr-auto w-52 rounded-2xl bg-gray-200 px-5 py-2 text-center">
+                  <button className="h-16">
+                    <p className="text-sm font-light leading-none">
+                      <span className="text-2xl font-semibold">
+                        ${laptopPrice!.toFixed(2)}
+                      </span>
+                      <br />
+                      One-Time payment
                     </p>
                   </button>
-                )
-              })}
-            </div>
 
-            <button className="mx-auto block w-80 rounded-xl bg-orange-main py-3 text-2xl text-white">
-              ADD TO CART
-            </button>
-          </section>
-        </>
-      ) : (
-        <div>
-          <section className="flex flex-col items-center">
-            {/* Skeleton for Laptop Title */}
-            <div className="mb-4 h-8 w-48 animate-pulse rounded bg-gray-300"></div>
+                  <div className="flex items-center justify-center">
+                    <div className="h-[0.5px] w-full bg-black" />
+                    <span>Or</span>
+                    <div className="h-[0.5px] w-full bg-black" />
+                  </div>
 
-            {/* Skeleton for Image */}
-            <div className="relative p-3">
-              <div className="flex">
-                <div className="min-w-full snap-center">
-                  <div className="mx-auto h-48 w-80 rounded bg-gray-300"></div>
+                  <button className="h-16">
+                    <p className="mx-auto text-sm font-light leading-none">
+                      <span className="text-2xl font-semibold">
+                        ${(laptopPrice! / 6).toFixed(2)}
+                      </span>
+                      <br />
+                      Suggested Payments with 6-months financing
+                    </p>
+                  </button>
+                </div>
+
+                <p className="text-justify font-light leading-5">
+                  {laptop.description}
+                </p>
+              </div>
+            </section>
+          )}
+
+          <section className="mx-auto md:flex md:justify-center">
+            <div className="mb-4 md:w-[30rem] lg:w-[45rem]">
+              <h2 className="border-b border-b-blue-main px-4 py-1 text-lg font-semibold text-blue-main">
+                Customize
+              </h2>
+
+              {/* Screen Size Selection */}
+              <div className="mt-5 flex items-center gap-x-5 md:block">
+                <span className="block md:mb-2">Screen size</span>
+                <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
+                  {laptop
+                    .screens!.sort((a, b) => a.size - b.size)
+                    .map((screen, index) => (
+                      <button
+                        key={screen.size}
+                        onClick={() => setScreenSelected(index)}
+                        className={`min-w-max rounded-lg border border-blue-main p-2 ${
+                          screenSelected === index
+                            ? "bg-blue-main text-white"
+                            : "bg-white text-blue-main"
+                        }`}
+                      >
+                        {screen.size}"
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {/* Processor Selection */}
+              <div className="mt-5 flex items-center gap-x-5 md:block">
+                <span className="md:mb-2 md:block">Processor</span>
+                <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
+                  {laptop.processors!.map((processor, index) => (
+                    <button
+                      key={processor.model}
+                      onClick={() => {
+                        setProcessorSelected(index)
+                      }}
+                      className={`min-w-max rounded-lg border border-blue-main p-2 ${
+                        processorSelected === index
+                          ? "bg-blue-main text-white"
+                          : "bg-white text-blue-main"
+                      }`}
+                    >
+                      {processor.brand} {processor.model}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* RAM Selection */}
+              <div className="mt-5 flex items-center gap-x-5 md:block">
+                <span className="md:mb-2 md:block">RAM</span>
+                <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
+                  {laptop.rams!.map((ram, index) => (
+                    <button
+                      key={ram.capacity}
+                      onClick={() => setRamSelected(index)}
+                      className={`min-w-max rounded-lg border border-blue-main p-2 ${
+                        ramSelected === index
+                          ? "bg-blue-main text-white"
+                          : "bg-white text-blue-main"
+                      }`}
+                    >
+                      {ram.capacity}GB
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Storage Selection */}
+              <div className="mt-5 flex items-center gap-x-5 md:block">
+                <span className="md:mb-2 md:block">Storage</span>
+                <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
+                  {laptop.storages!.map((storage, index) => (
+                    <button
+                      key={storage.capacity}
+                      onClick={() => setStorageSelected(index)}
+                      className={`min-w-max rounded-lg border border-blue-main p-2 ${
+                        storageSelected === index
+                          ? "bg-blue-main text-white"
+                          : "bg-white text-blue-main"
+                      }`}
+                    >
+                      {storage.capacity}
+                      {storage.capacity_unit} {storage.type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Graphic Card Selection */}
+              <div className="mt-5 flex items-center gap-x-5 md:block">
+                <span className="md:mb-2 md:block">Graphics</span>
+                <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
+                  {laptop.graphicCards && laptop.graphicCards.length > 0 ? (
+                    laptop.graphicCards.map((graphicCard, index) => (
+                      <button
+                        key={graphicCard.model}
+                        onClick={() => setGraphicCard(index)}
+                        className={`min-w-max rounded-lg border border-blue-main p-2 ${
+                          graphicCardSelected === index
+                            ? "bg-blue-main text-white"
+                            : "bg-white text-blue-main"
+                        }`}
+                      >
+                        {graphicCard.brand} {graphicCard.model}
+                      </button>
+                    ))
+                  ) : (
+                    <span>Integrated with the processor</span>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Skeleton for Price */}
-            <div className="my-3 h-12 w-48 animate-pulse rounded bg-gray-300"></div>
-          </section>
-
-          <section className="mt-5">
-            <h2 className="mb-4 h-6 w-32 animate-pulse rounded bg-gray-300"></h2>
-
-            {/* Skeleton for Screen Size */}
-            <div className="mb-4 flex items-center gap-x-5">
-              <span className="h-5 w-20 animate-pulse rounded bg-gray-300"></span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {[1, 2, 3].map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-10 w-20 animate-pulse rounded-lg bg-gray-300"
-                  ></div>
-                ))}
+            <div className="mt-6 pl-5">
+              <div className="mx-auto my-5 flex w-[95%] max-w-[28rem] justify-center gap-x-2">
+                {Object.entries(deliveries).map(([key, value]) => {
+                  return (
+                    <button
+                      onClick={() => setDeliverySelected(value)}
+                      key={key}
+                      className={`flex w-1/4 flex-col items-center justify-center gap-y-1 rounded-xl border border-blue-main p-1 ${deliverySelected === value ? "bg-blue-main text-white" : "bg-white text-blue-main"}`}
+                    >
+                      <div
+                        className={`flex items-center justify-center rounded-full bg-white p-2 ${deliverySelected === value ? "bg-blue-main text-white" : "bg-white text-blue-main"}`}
+                      >
+                        {value && (
+                          <img
+                            src={deliveryIcons[key]}
+                            alt={value}
+                            className="h-8"
+                          />
+                        )}
+                      </div>
+                      <p className="w-16 text-center text-sm leading-none">
+                        {value}
+                      </p>
+                    </button>
+                  )
+                })}
               </div>
-            </div>
-
-            {/* Skeleton for Processor */}
-            <div className="mb-4 flex items-center gap-x-5">
-              <span className="h-5 w-20 animate-pulse rounded bg-gray-300"></span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {[1, 2, 3].map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-10 w-32 animate-pulse rounded-lg bg-gray-300"
-                  ></div>
-                ))}
-              </div>
-            </div>
-
-            {/* Skeleton for RAM */}
-            <div className="mb-4 flex items-center gap-x-5">
-              <span className="h-5 w-20 animate-pulse rounded bg-gray-300"></span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {[1, 2, 3].map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-10 w-16 animate-pulse rounded-lg bg-gray-300"
-                  ></div>
-                ))}
-              </div>
-            </div>
-
-            {/* Skeleton for Storage */}
-            <div className="mb-4 flex items-center gap-x-5">
-              <span className="h-5 w-20 animate-pulse rounded bg-gray-300"></span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {[1, 2, 3].map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-10 w-28 animate-pulse rounded-lg bg-gray-300"
-                  ></div>
-                ))}
-              </div>
-            </div>
-
-            {/* Skeleton for Graphics */}
-            <div className="mb-4 flex items-center gap-x-5">
-              <span className="h-5 w-20 animate-pulse rounded bg-gray-300"></span>
-              <div className="no-scrollbar flex gap-x-3 overflow-x-auto">
-                {[1, 2].map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-10 w-32 animate-pulse rounded-lg bg-gray-300"
-                  ></div>
-                ))}
-              </div>
+              <button className="mx-auto mb-4 block w-80 rounded-xl bg-orange-main py-3 text-2xl text-white">
+                ADD TO CART
+              </button>
             </div>
           </section>
-        </div>
+        </>
+      ) : (
+        <LaptopSkeleton />
       )}
     </div>
   )

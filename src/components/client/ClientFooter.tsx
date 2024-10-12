@@ -42,7 +42,7 @@ const ClientFooter = () => {
       <div className="flex flex-col justify-center gap-y-3 border-b border-b-white px-[10%] pb-4 md:flex-row md:justify-between">
         {Object.entries(clientServices).map(([key, value]) => {
           return (
-            <div className="flex items-center md:justify-center">
+            <div key={key} className="flex items-center md:justify-center">
               <div className="w-16">
                 <img
                   src={clientServicesIcons?.[key]}
