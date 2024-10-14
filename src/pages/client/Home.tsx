@@ -110,7 +110,7 @@ const Home = () => {
         </div>
 
         <div className="md:h-76 md:relative md:bottom-7 md:flex md:items-center md:gap-x-4">
-          <div className="mx-auto my-3 w-[22rem] max-w-[90%] rounded-2xl bg-white px-4 py-2 text-blue-main md:w-[20rem]">
+          <div className="mx-auto my-3 w-[22rem] max-w-[90%] rounded-2xl bg-white px-4 py-2 text-blue-main md:mx-0 md:w-[20rem]">
             <h2 className="text-3xl font-extrabold md:mb-2">Top picks</h2>
             <p className="text-sm md:w-[15rem] md:text-lg md:leading-none">
               Discover our most popular tech essentials
@@ -122,7 +122,7 @@ const Home = () => {
               laptops.map((laptop) => (
                 <Link
                   to={`/laptop/${laptop.id}`}
-                  className="flex h-36 w-36 flex-col items-center justify-center rounded-2xl bg-white text-center"
+                  className="flex h-40 w-40 flex-col items-center justify-center rounded-2xl bg-white text-center"
                   key={laptop.id}
                 >
                   <div>
@@ -139,11 +139,11 @@ const Home = () => {
                 </Link>
               ))
             ) : (
-              <div className="no-scrollbar my-4 flex gap-x-4 overflow-x-scroll p-[5%] md:my-0 md:w-[calc(100vw-25rem)] lg:p-0">
-                <div className="h-36 min-h-36 w-36 min-w-36 flex-grow animate-pulse rounded-2xl bg-gray-300 md:h-36 md:w-36" />
-                <div className="min-h-36 w-36 min-w-36 flex-grow animate-pulse rounded-2xl bg-gray-300 md:h-36 md:w-36" />
-                <div className="min-h-36 w-36 min-w-36 flex-grow animate-pulse rounded-2xl bg-gray-300 md:h-36 md:w-36" />
-                <div className="min-h-36 w-36 min-w-36 flex-grow animate-pulse rounded-2xl bg-gray-300 md:h-36 md:w-36" />
+              <div className="no-scrollbar flex gap-x-4 overflow-scroll px-[5%] md:my-0 lg:p-0">
+                <div className="h-40 min-h-40 w-40 min-w-40 animate-pulse rounded-2xl bg-gray-300" />
+                <div className="h-40 min-h-40 w-40 min-w-40 animate-pulse rounded-2xl bg-gray-300" />
+                <div className="h-40 min-h-40 w-40 min-w-40 animate-pulse rounded-2xl bg-gray-300" />
+                <div className="h-40 min-h-40 w-40 min-w-40 animate-pulse rounded-2xl bg-gray-300" />
               </div>
             )}
           </div>
