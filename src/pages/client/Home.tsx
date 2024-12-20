@@ -217,7 +217,10 @@ const Home = () => {
               {deliveries.map((delivery) => {
                 const { Icon, description } = delivery
                 return (
-                  <div className="flex flex-col items-center justify-center gap-y-1">
+                  <div
+                    className="flex flex-col items-center justify-center gap-y-1"
+                    key={description}
+                  >
                     <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white p-2 md:h-10 md:w-10 md:bg-blue-main lg:h-20 lg:w-20">
                       <Icon color={isMobile ? "223fc7" : "fff"} />
                     </div>
