@@ -2,18 +2,22 @@ import { useState, useRef, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import fetchLaptop, { LaptopInformation } from "../../utils/fetchLaptop"
 import { useIsMobile } from "../../hooks/useIsMobile"
+import useCartStore from "../../store"
 import LaptopSkeleton from "../../components/client/LaptopSkeleton"
 
 const Laptop = () => {
   const [laptop, setLaptop] = useState<LaptopInformation | null>(null)
-  const [currentImage, setCurrentImage] = useState(0)
-  const sliderRef = useRef<HTMLDivElement>(null)
-  const { id } = useParams()
-  const isMobile = useIsMobile()
+  const [laptopName, setLaptopName] = useState<string>("")
   const [laptopPrice, setLaptopPrice] = useState<number>(0)
   const [deliveryIcons, setDeliveryIcons] = useState<{ [key: string]: string }>(
     {}
   )
+  const [currentImage, setCurrentImage] = useState(0)
+
+  const sliderRef = useRef<HTMLDivElement>(null)
+  const { id } = useParams()
+  const isMobile = useIsMobile()
+  const { addItem } = useCartStore()
 
   // Components Selected
   const [screenSelected, setScreenSelected] = useState<number>(0)
@@ -112,7 +116,15 @@ const Laptop = () => {
 
   useEffect(() => {
     if (laptop) {
-      const { screens, rams, storages, processors, graphicCards } = laptop
+      const {
+        screens,
+        rams,
+        storages,
+        processors,
+        graphicCards,
+        brand,
+        model
+      } = laptop
 
       const screenPrice = screens?.[screenSelected]?.price_adjustment || 0
       const ramPrice = rams?.[ramSelected]?.price_adjustment || 0
@@ -131,6 +143,9 @@ const Laptop = () => {
         graphicCardPrice
 
       setLaptopPrice(totalPrice)
+      setLaptopName(
+        `${brand} - ${model} - ${screens?.[screenSelected].size}" - ${processors?.[processorSelected].brand} ${processors?.[processorSelected].model} with ${rams?.[ramSelected].capacity}GB Memory - ${storages?.[storageSelected].capacity} ${storages?.[storageSelected].capacity_unit} ${storages?.[storageSelected].type}`
+      )
     }
   }, [
     screenSelected,
@@ -141,19 +156,24 @@ const Laptop = () => {
     laptop
   ])
 
+  const addToCart = () => {
+    if (laptop && id) {
+      addItem({
+        id,
+        name: laptopName,
+        price: laptopPrice,
+        quantity: 1
+      })
+    }
+  }
+
   return (
     <div className="p-3 font-baloo font-medium leading-none">
       {laptop && laptop.images ? (
         <>
           {isMobile ? (
             <section className="flex w-full flex-col items-center">
-              <h1 className="text-justified">
-                {laptop.brand} - {laptop.model} - {laptop.screens?.[0].size}" -{" "}
-                {laptop.processors?.[0].brand} {laptop.processors?.[0].model}{" "}
-                with {laptop.rams?.[0].capacity}GB Memory -{" "}
-                {laptop.storages?.[0].capacity}
-                {laptop.storages?.[0].capacity_unit} {laptop.storages?.[0].type}
-              </h1>
+              <h1 className="text-justified">{laptopName}</h1>
 
               <div className="relative p-3">
                 <div
@@ -417,7 +437,10 @@ const Laptop = () => {
                   )
                 })}
               </div>
-              <button className="mx-auto mb-4 block w-80 rounded-xl bg-orange-main py-3 text-2xl text-white">
+              <button
+                onClick={addToCart}
+                className="mx-auto mb-4 block w-80 rounded-xl bg-orange-main py-3 text-2xl text-white"
+              >
                 ADD TO CART
               </button>
             </div>
