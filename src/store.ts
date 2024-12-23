@@ -6,11 +6,13 @@ export interface CartItem {
   name: string
   price: number
   quantity: number
+  url_photo: string
 }
 
 interface CartState {
   items: CartItem[]
   addItem: (item: CartItem) => void
+  decreaseItem: (id: string) => void
   removeItem: (id: string) => void
 }
 
@@ -24,15 +26,21 @@ const useCartStore = create<CartState>()(
           if (existingItem) {
             return {
               items: state.items.map((i) =>
-                i.id === item.id
-                  ? { ...i, quantity: i.quantity + item.quantity }
-                  : i
+                i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
               )
             }
           } else {
-            return { items: [...state.items, item] }
+            return { items: [...state.items, { ...item, quantity: 1 }] }
           }
         }),
+      decreaseItem: (id) =>
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.id === id && item.quantity > 1
+              ? { ...item, quantity: item.quantity - 1 }
+              : item
+          )
+        })),
       removeItem: (id) =>
         set((state) => ({
           items: state.items.filter((item) => item.id !== id)

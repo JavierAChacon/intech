@@ -6,6 +6,7 @@ import Index from "./pages/admin/Index"
 import AdminLogin from "./pages/admin/AdminLogin"
 import ClientLayout from "./components/client/ClientLayout"
 import Laptop from "./pages/client/Laptop"
+import Cart from "./pages/client/Cart"
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route element={<ClientLayout />}>
         <Route index element={<Home />} />
         <Route path="/laptop/:id" element={<Laptop />} />
+        <Route path="/cart" element={<Cart />} />
       </Route>
 
       {/* Admin */}

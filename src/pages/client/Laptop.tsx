@@ -157,12 +157,13 @@ const Laptop = () => {
   ])
 
   const addToCart = () => {
-    if (laptop && id) {
+    if (laptop && id && laptop.images) {
       addItem({
         id,
         name: laptopName,
         price: laptopPrice,
-        quantity: 1
+        quantity: 1,
+        url_photo: laptop.images?.[0]
       })
     }
   }
