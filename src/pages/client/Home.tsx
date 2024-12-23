@@ -49,6 +49,7 @@ const Home = () => {
         const { data: laptopData, error } = await supabase
           .from("laptop")
           .select("id, brand, model, price")
+          .order("created_at", { ascending: false })
           .limit(5)
 
         if (error) {
@@ -87,8 +88,8 @@ const Home = () => {
   }, [])
 
   return (
-    <div className="overflow-x-hidden font-baloo">
-      <section className="flex flex-col overflow-x-hidden bg-[linear-gradient(180deg,_white_0%,_#223fc7_100%)] lg:items-center">
+    <div className="font-baloo">
+      <section className="flex flex-col bg-[linear-gradient(180deg,_white_0%,_#223fc7_100%)] lg:items-center">
         <div className="grid grid-cols-1 md:grid-flow-col md:grid-cols-2 md:items-center md:gap-8">
           <div className="order-2 md:order-1 md:justify-self-end">
             <img src={macbook} alt="Macbook" className="w-full md:w-[35rem]" />
@@ -117,23 +118,23 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="mb-4 px-[5%] md:mb-0">
+          <div className="no-scrollbar mb-4 flex gap-x-4 overflow-scroll px-[5%] md:mb-0">
             {laptops.length > 0 ? (
               laptops.map((laptop) => (
                 <Link
                   to={`/laptop/${laptop.id}`}
-                  className="flex h-40 w-40 flex-col items-center justify-center rounded-2xl bg-white text-center"
+                  className="flex h-40 w-44 flex-col items-center justify-center rounded-2xl bg-white text-center"
                   key={laptop.id}
                 >
-                  <div>
+                  <div className="flex w-40 justify-center">
                     <img
                       src={laptop.image}
                       alt={laptop.model}
                       className="h-20"
                     />
                   </div>
-                  <p>
-                    {laptop.brand} {laptop.model}
+                  <p className="mt-2 leading-none">
+                    {laptop.brand + " " + laptop.model}
                   </p>
                   <span className="text-xl font-bold">${laptop.price}</span>
                 </Link>
@@ -150,7 +151,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="mx-auto w-96 max-w-[95%] md:grid md:w-[95%] md:grid-cols-12 md:grid-rows-4">
+      <section className="mx-auto w-96 max-w-[95%] overflow-hidden md:grid md:w-[95%] md:grid-cols-12 md:grid-rows-4">
         <div className="mx-auto mt-4 w-[22rem] rounded-2xl bg-gray-300 p-2 text-center md:col-span-6 md:row-span-3 md:flex md:w-[70%] md:flex-col md:items-center md:justify-center">
           <h3 className="text-2xl font-bold md:text-4xl lg:mt-3">
             Need Some Guidance?
