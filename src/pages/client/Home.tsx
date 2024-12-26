@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { supabase } from "../../supabase"
 import { Link } from "react-router-dom"
 import { useIsMobile } from "../../hooks/useIsMobile"
-import PickUp from "../../components/icons/PickUp"
 import SameDay from "../../components/icons/SameDay"
 import NextDay from "../../components/icons/NextDay"
 import Standard from "../../components/icons/Standard"
@@ -25,10 +24,6 @@ const Home = () => {
   const isMobile = useIsMobile()
 
   const deliveries = [
-    {
-      description: "Pick-up in store",
-      Icon: PickUp
-    },
     {
       description: "Same-day delivery",
       Icon: SameDay
@@ -140,11 +135,11 @@ const Home = () => {
                 </Link>
               ))
             ) : (
-              <div className="no-scrollbar flex gap-x-4 overflow-scroll px-[5%] md:my-0 lg:p-0">
-                <div className="h-40 min-h-40 w-40 min-w-40 animate-pulse rounded-2xl bg-gray-300" />
-                <div className="h-40 min-h-40 w-40 min-w-40 animate-pulse rounded-2xl bg-gray-300" />
-                <div className="h-40 min-h-40 w-40 min-w-40 animate-pulse rounded-2xl bg-gray-300" />
-                <div className="h-40 min-h-40 w-40 min-w-40 animate-pulse rounded-2xl bg-gray-300" />
+              <div className="no-scrollbar flex justify-start gap-x-4 overflow-x-scroll md:my-0 lg:min-w-[49rem] lg:p-0">
+                <div className="min-h-40 min-w-44 animate-pulse rounded-2xl bg-gray-300 lg:h-40 lg:w-40" />
+                <div className="min-h-40 min-w-44 animate-pulse rounded-2xl bg-gray-300 lg:h-40 lg:w-40" />
+                <div className="min-h-40 min-w-44 animate-pulse rounded-2xl bg-gray-300 lg:h-40 lg:w-40" />
+                <div className="min-h-40 min-w-44 animate-pulse rounded-2xl bg-gray-300 lg:h-40 lg:w-40" />
               </div>
             )}
           </div>
@@ -163,7 +158,7 @@ const Home = () => {
           </p>
 
           <Link
-            to="/"
+            to="/search/categories"
             className="mx-auto my-4 block w-fit rounded-2xl bg-orange-main px-5 py-2 text-white lg:text-xl"
           >
             Shop by category
@@ -214,7 +209,7 @@ const Home = () => {
           </h4>
 
           <div className="rounded-xl bg-blue-main p-4 text-white md:mx-auto md:w-[55%] md:bg-white md:p-0 md:text-black">
-            <div className="grid grid-cols-2 grid-rows-2 gap-4 md:grid-cols-4 md:grid-rows-1">
+            <div className="grid grid-cols-3 grid-rows-1 gap-4 md:grid-cols-3 md:grid-rows-1">
               {deliveries.map((delivery) => {
                 const { Icon, description } = delivery
                 return (

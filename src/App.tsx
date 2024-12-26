@@ -7,6 +7,7 @@ import AdminLogin from "./pages/admin/AdminLogin"
 import ClientLayout from "./components/client/ClientLayout"
 import Laptop from "./pages/client/Laptop"
 import Cart from "./pages/client/Cart"
+import Search from "./pages/client/Search"
 
 function App() {
   return (
@@ -16,6 +17,9 @@ function App() {
         <Route index element={<Home />} />
         <Route path="/laptop/:id" element={<Laptop />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/search/:option" element={<Search />} />
+        <Route path="/search/:option/:id/:configuration" element={<Laptop />} />
       </Route>
 
       {/* Admin */}

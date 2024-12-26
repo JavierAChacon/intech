@@ -4,9 +4,27 @@ import fetchLaptop, { LaptopInformation } from "../../utils/fetchLaptop"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import useCartStore from "../../store"
 import LaptopSkeleton from "../../components/client/LaptopSkeleton"
+import { toast } from "@/hooks/use-toast"
+import { supabase } from "../../supabase"
+
+interface Configuration {
+  configuration_id: string
+  id: string
+  brand: string
+  model: string
+  category: string
+  graphic_card: string
+  processor: string
+  ram: number
+  screen: number
+  storage: string
+  price: number
+}
 
 const Laptop = () => {
   const [laptop, setLaptop] = useState<LaptopInformation | null>(null)
+  const [laptopConfiguration, setLaptopConfiguration] =
+    useState<Configuration>()
   const [laptopName, setLaptopName] = useState<string>("")
   const [laptopPrice, setLaptopPrice] = useState<number>(0)
   const [deliveryIcons, setDeliveryIcons] = useState<{ [key: string]: string }>(
@@ -15,7 +33,7 @@ const Laptop = () => {
   const [currentImage, setCurrentImage] = useState(0)
 
   const sliderRef = useRef<HTMLDivElement>(null)
-  const { id } = useParams()
+  const { id, configuration } = useParams()
   const isMobile = useIsMobile()
   const { addItem } = useCartStore()
 
@@ -24,13 +42,13 @@ const Laptop = () => {
   const [processorSelected, setProcessorSelected] = useState<number>(0)
   const [ramSelected, setRamSelected] = useState<number>(0)
   const [storageSelected, setStorageSelected] = useState<number>(0)
-  const [graphicCardSelected, setGraphicCard] = useState<number | null>(null)
+  const [graphicCardSelected, setGraphicCardSelected] = useState<number>(0)
 
   // Delivery Selected
-  const [deliverySelected, setDeliverySelected] = useState<null | string>(null)
+  const [deliverySelected, setDeliverySelected] =
+    useState<string>("Same-day delivery")
 
   const deliveries = {
-    pickUp: "Pick-up in store",
     sameDay: "Same-day delivery",
     nextDay: "Next day delivery",
     standard: "Standard delivery"
@@ -54,6 +72,20 @@ const Laptop = () => {
             setLaptop(sortedLaptop)
 
             setLaptopPrice(sortedLaptop.price)
+          }
+        }
+
+        if (configuration) {
+          const { data: configurationData, error: errorConfiguration } =
+            await supabase
+              .from("laptop_configurations_table")
+              .select("*")
+              .eq("configuration_id", configuration)
+              .single()
+
+          setLaptopConfiguration(configurationData ? configurationData : {})
+          if (errorConfiguration) {
+            console.error(errorConfiguration)
           }
         }
       } catch (err) {
@@ -115,6 +147,37 @@ const Laptop = () => {
   }, [currentImage, laptop])
 
   useEffect(() => {
+    if (laptopConfiguration && laptop) {
+      const screenIndex = laptop.screens.findIndex(
+        (screen) => screen.size === laptopConfiguration.screen
+      )
+      const ramIndex = laptop.rams.findIndex(
+        (ram) => ram.capacity === laptopConfiguration.ram
+      )
+      const storageIndex = laptop.storages.findIndex(
+        (storage) =>
+          `${storage.capacity}${storage.capacity_unit} ${storage.type}` ===
+          laptopConfiguration.storage
+      )
+      const processorIndex = laptop.processors.findIndex(
+        (processor) => processor.model === laptopConfiguration.processor
+      )
+      const graphicCardIndex = laptop.graphicCards
+        ? laptop.graphicCards.findIndex(
+            (graphicCard) =>
+              graphicCard.model === laptopConfiguration.graphic_card
+          )
+        : 0
+
+      setScreenSelected(screenIndex !== -1 ? screenIndex : 0)
+      setRamSelected(ramIndex !== -1 ? ramIndex : 0)
+      setStorageSelected(storageIndex !== -1 ? storageIndex : 0)
+      setProcessorSelected(processorIndex !== -1 ? processorIndex : 0)
+      setGraphicCardSelected(graphicCardIndex !== -1 ? graphicCardIndex : 0)
+    }
+  }, [laptopConfiguration, laptop])
+
+  useEffect(() => {
     if (laptop) {
       const {
         screens,
@@ -155,18 +218,6 @@ const Laptop = () => {
     graphicCardSelected,
     laptop
   ])
-
-  const addToCart = () => {
-    if (laptop && id && laptop.images) {
-      addItem({
-        id,
-        name: laptopName,
-        price: laptopPrice,
-        quantity: 1,
-        url_photo: laptop.images?.[0]
-      })
-    }
-  }
 
   return (
     <div className="p-3 font-baloo font-medium leading-none">
@@ -250,15 +301,7 @@ const Laptop = () => {
               </div>
 
               <div className="w-80">
-                <h1 className="text-justified">
-                  {laptop.brand} - {laptop.model} - {laptop.screens?.[0].size}"
-                  - {laptop.processors?.[0].brand}{" "}
-                  {laptop.processors?.[0].model} with{" "}
-                  {laptop.rams?.[0].capacity}GB Memory -{" "}
-                  {laptop.storages?.[0].capacity}
-                  {laptop.storages?.[0].capacity_unit}{" "}
-                  {laptop.storages?.[0].type}
-                </h1>
+                <h1 className="text-justified">{laptopName}</h1>
 
                 <div className="my-3 mr-auto w-52 rounded-2xl bg-gray-200 px-5 py-2 text-center">
                   <button className="h-16">
@@ -394,7 +437,7 @@ const Laptop = () => {
                     laptop.graphicCards.map((graphicCard, index) => (
                       <button
                         key={graphicCard.model}
-                        onClick={() => setGraphicCard(index)}
+                        onClick={() => setGraphicCardSelected(index)}
                         className={`min-w-max rounded-lg border border-blue-main p-2 ${
                           graphicCardSelected === index
                             ? "bg-blue-main text-white"
@@ -439,7 +482,28 @@ const Laptop = () => {
                 })}
               </div>
               <button
-                onClick={addToCart}
+                onClick={() => {
+                  if (laptop.images && id) {
+                    addItem({
+                      id,
+                      name: laptopName,
+                      price: laptopPrice,
+                      quantity: 1,
+                      url_photo: laptop.images[0]
+                    })
+
+                    toast({
+                      description: "Item added to cart",
+                      style: {
+                        backgroundColor: "#4caf50",
+                        color: "#fff",
+                        fontWeight: "bold",
+                        border: "none"
+                      },
+                      duration: 900
+                    })
+                  }
+                }}
                 className="mx-auto mb-4 block w-80 rounded-xl bg-orange-main py-3 text-2xl text-white"
               >
                 ADD TO CART
