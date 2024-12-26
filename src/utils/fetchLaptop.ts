@@ -5,23 +5,17 @@ export interface LaptopInformation {
   model: string
   description: string
   price: number
-  graphicCards:
-    | { brand: string; model: string; price_adjustment: number }[]
-    | null
-  processors:
-    | { brand: string; model: string; price_adjustment: number }[]
-    | null
-  rams: { capacity: number; price_adjustment: number }[] | null
-  screens: { size: number; price_adjustment: number }[] | null
-  storages:
-    | {
-        capacity: number
-        capacity_unit: string
-        type: string
-        price_adjustment: number
-      }[]
-    | null
-  images: string[] | null
+  graphicCards: { brand: string; model: string; price_adjustment: number }[]
+  processors: { brand: string; model: string; price_adjustment: number }[]
+  rams: { capacity: number; price_adjustment: number }[]
+  screens: { size: number; price_adjustment: number }[]
+  storages: {
+    capacity: number
+    capacity_unit: string
+    type: string
+    price_adjustment: number
+  }[]
+  images: string[]
 }
 
 const fetchLaptop = async (
@@ -96,7 +90,7 @@ const fetchLaptop = async (
                   `Error fetching graphic card with id ${item.graphic_card_id}:`,
                   graphicCardError
                 )
-                return null
+                return []
               }
 
               return {
@@ -116,7 +110,7 @@ const fetchLaptop = async (
             } => item !== null
           )
         )
-      : null
+      : []
 
   const processors =
     processorIds && processorIds.length > 0
@@ -132,7 +126,7 @@ const fetchLaptop = async (
                 `Error fetching processor with id ${item.processor_id}:`,
                 processorError
               )
-              return null
+              return []
             }
 
             return {
@@ -151,7 +145,7 @@ const fetchLaptop = async (
             } => item !== null
           )
         )
-      : null
+      : []
 
   const rams =
     ramIds && ramIds.length > 0
@@ -167,7 +161,7 @@ const fetchLaptop = async (
                 `Error fetching RAM with id ${item.ram_id}:`,
                 ramError
               )
-              return null
+              return []
             }
 
             return {
@@ -181,7 +175,7 @@ const fetchLaptop = async (
               item !== null
           )
         )
-      : null
+      : []
 
   const screens =
     screenIds && screenIds.length > 0
@@ -197,7 +191,7 @@ const fetchLaptop = async (
                 `Error fetching screen with id ${item.screen_id}:`,
                 screenError
               )
-              return null
+              return []
             }
 
             return {
@@ -211,7 +205,7 @@ const fetchLaptop = async (
               item !== null
           )
         )
-      : null
+      : []
 
   const storages =
     storageIds && storageIds.length > 0
@@ -227,7 +221,7 @@ const fetchLaptop = async (
                 `Error fetching storage with id ${item.storage_id}:`,
                 storageError
               )
-              return null
+              return []
             }
 
             return {
@@ -247,7 +241,7 @@ const fetchLaptop = async (
             } => item !== null
           )
         )
-      : null
+      : []
 
   const { data: imageFiles, error: imageError } = await supabase.storage
     .from("laptops")
@@ -267,7 +261,7 @@ const fetchLaptop = async (
             return publicUrl.publicUrl
           })
         )
-      : null
+      : []
 
   const fetchedLaptop: LaptopInformation = {
     brand,
