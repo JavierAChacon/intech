@@ -1,8 +1,10 @@
 import useCartStore from "../../store"
 import { FaRegTrashCan } from "react-icons/fa6"
+import { useToast } from "@/hooks/use-toast"
 
 const Cart = () => {
   const { items, removeItem, addItem, decreaseItem } = useCartStore()
+  const { toast } = useToast()
 
   const subtotal = items
     .reduce((acc, item) => acc + item.price * item.quantity, 0)
@@ -17,59 +19,78 @@ const Cart = () => {
 
   return (
     <div className="relative justify-center px-4 lg:mx-auto lg:mt-4 lg:flex lg:w-[80rem] lg:gap-x-4">
-      <div>
+      <div className="lg:min-w-[45rem]">
         <h1 className="mb-2 border-b border-b-blue-main py-2 font-baloo text-2xl font-bold">
           Shopping Cart
         </h1>
 
         <div className="min-h-72">
-          {items.map((item) => {
-            const { id, url_photo, name, price, quantity } = item
-            return (
-              <div
-                className="flex items-start border-b border-[#16243F] p-2"
-                key={id}
-              >
-                <div className="w-20 flex-shrink-0">
-                  <img src={url_photo} />
-                </div>
-
-                <div className="mx-4 flex-auto">
-                  <h2>{name}</h2>
-
-                  <div className="mt-2 flex w-full justify-between">
-                    <div className="flex items-center">
-                      <button
-                        onClick={() => decreaseItem(id)}
-                        disabled={quantity === 1}
-                        className="flex w-6 items-center justify-center rounded-l-md bg-[#16243F] text-lg font-semibold text-white disabled:bg-gray-600"
-                      >
-                        -
-                      </button>
-
-                      <div className="h-7 w-7 border-y border-[#16243F] px-2 text-center">
-                        {quantity}
-                      </div>
-
-                      <button
-                        onClick={() => addItem(item)}
-                        className="flex w-6 items-center justify-center rounded-r-md bg-[#16243F] text-lg font-semibold text-white"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <p className="relative right-4 text-right text-lg font-semibold">
-                      ${(price * quantity).toFixed(2)}
-                    </p>
+          {items.length === 0 ? (
+            <p className="text-center">Your cart is empty</p>
+          ) : (
+            items.map((item) => {
+              const { id, url_photo, name, price, quantity } = item
+              return (
+                <div
+                  className="flex items-start border-b border-[#16243F] p-2"
+                  key={id}
+                >
+                  <div className="w-20 flex-shrink-0">
+                    <img src={url_photo} />
                   </div>
-                </div>
 
-                <button onClick={() => removeItem(id)} className="ml-auto">
-                  <FaRegTrashCan className="text-2xl" />
-                </button>
-              </div>
-            )
-          })}
+                  <div className="mx-4 flex-auto">
+                    <h2>{name}</h2>
+
+                    <div className="mt-2 flex w-full justify-between">
+                      <div className="flex items-center">
+                        <button
+                          onClick={() => decreaseItem(id)}
+                          disabled={quantity === 1}
+                          className="flex w-6 items-center justify-center rounded-l-md bg-[#16243F] text-lg font-semibold text-white disabled:bg-gray-600"
+                        >
+                          -
+                        </button>
+
+                        <div className="h-7 w-7 border-y border-[#16243F] px-2 text-center">
+                          {quantity}
+                        </div>
+
+                        <button
+                          onClick={() => addItem(item)}
+                          className="flex w-6 items-center justify-center rounded-r-md bg-[#16243F] text-lg font-semibold text-white"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <p className="relative right-4 text-right text-lg font-semibold">
+                        ${(price * quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      removeItem(id)
+                      toast({
+                        description: "Item deleted from cart",
+                        style: {
+                          backgroundColor: "#f44336",
+                          color: "#fff",
+                          fontWeight: "bold",
+                          border: "none"
+                        },
+                        duration: 900
+                      })
+                    }}
+                    className="ml-auto"
+                  >
+                    <FaRegTrashCan className="text-2xl" />
+                  </button>
+                </div>
+              )
+            })
+          )}
         </div>
       </div>
 
