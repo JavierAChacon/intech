@@ -1,4 +1,4 @@
-import useCartStore from "../../store"
+import { useCartStore } from "../../store"
 import { FaRegTrashCan } from "react-icons/fa6"
 import { useToast } from "@/hooks/use-toast"
 
