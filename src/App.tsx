@@ -18,10 +18,14 @@ function App() {
         <Route path="/laptop/:id" element={<Laptop />} />
         <Route path="/laptop/:id/:configuration" element={<Laptop />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/search/:option" element={<Search />} />
-        <Route path="/search/:option/:id/:configuration" element={<Laptop />} />
-        <Route path="/search/:id/:configuration" element={<Laptop />} />
+        <Route path="/search/" element={<Search />} />
+        <Route path="/search/:page" element={<Search />} />
+        <Route path="/search/:option/:page" element={<Search />} />
+        <Route
+          path="/search/:option/:id/:configuration/:page"
+          element={<Laptop />}
+        />
+        <Route path="/search/:id/:configuration/:page" element={<Laptop />} />
       </Route>
 
       {/* Admin */}
