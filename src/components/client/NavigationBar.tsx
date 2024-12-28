@@ -1,42 +1,89 @@
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
-import type { SubmitHandler } from "react-hook-form"
 import z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Spin as Hamburger } from "hamburger-react"
 import cart from "../../assets/icons/cart.svg"
 import logo from "../../assets/icons/logo.svg"
-import user from "../../assets/icons/user.svg"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { supabase } from "@/supabase"
+import { useIsMobile } from "@/hooks/useIsMobile"
+import { FaSearch } from "react-icons/fa"
 
 const SearchSchema = z.object({
   search: z.string()
 })
 
+interface Configuration {
+  configuration_id: string
+  id: string
+  brand: string
+  model: string
+  category: string
+  graphic_card: string
+  processor: string
+  ram: number
+  screen: number
+  storage: string
+  price: number
+}
+
 type SearchSchemaType = z.infer<typeof SearchSchema>
 
 const NavigationBar = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const { register, handleSubmit } = useForm<SearchSchemaType>({
+  const { register, watch, reset } = useForm<SearchSchemaType>({
     resolver: zodResolver(SearchSchema)
   })
 
-  const onSubmit: SubmitHandler<SearchSchemaType> = (data) => {
-    console.log(data)
-  }
+  const [results, setResults] = useState<Configuration[]>([])
+  const [laptops, setLaptops] = useState<Configuration[]>([])
+  const searchValue = watch("search")
+  const isMobile = useIsMobile()
+
+  useEffect(() => {
+    const fecthLaptops = async () => {
+      const { data: laptopsFetched, error: laptopsError } = await supabase
+        .from("laptop_configurations_table")
+        .select("*")
+
+      if (laptopsError) {
+        console.error(laptopsError)
+      }
+
+      setLaptops(laptopsFetched ? laptopsFetched : [])
+    }
+
+    fecthLaptops()
+  }, [])
+
+  useEffect(() => {
+    if (searchValue) {
+      const filtered = laptops
+        .filter((laptop) =>
+          `${laptop.brand} ${laptop.model} - ${laptop.screen}" - ${laptop.processor} with ${laptop.ram} Memory - ${laptop.storage}`
+            .toLowerCase()
+            .includes(searchValue.toLowerCase())
+        )
+        .slice(0, 5)
+      setResults(filtered)
+    } else {
+      setResults([])
+    }
+  }, [searchValue, laptops])
 
   return (
     <header>
       <nav>
-        <div className="flex items-center border border-b-blue-main py-3 md:border-0">
+        <div className="mx-auto flex items-center border border-b-blue-main py-3 md:border-0 lg:w-3/4">
           <div className="ml-2 flex items-center">
             <Link to="/">
               <img src={logo} alt="intech" className="md:h-5" />
             </Link>
           </div>
 
-          <div className="flex flex-1 justify-center">
-            <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="relative flex flex-1 flex-col items-center justify-center">
+            <form>
               <input
                 type="text"
                 placeholder="Search"
@@ -44,16 +91,39 @@ const NavigationBar = () => {
                 {...register("search")}
               />
             </form>
+            {results.length > 0 && (
+              <div className="absolute top-7 z-10 flex w-48 flex-col rounded-2xl border-black bg-gray-300 md:top-10 md:w-96 md:border-2">
+                {results.map((result, index) => {
+                  const { configuration_id, id } = result
+                  const laptopName = `${result.brand} ${result.model} - ${result.screen}" - ${result.processor} with ${result.ram} Memory - ${result.storage}`
+                  return (
+                    <Link
+                      to={`/laptop/${id}/${configuration_id}`}
+                      key={configuration_id}
+                      onClick={() => reset({ search: "" })}
+                      className={`flex items-center gap-x-2 border-b p-2 md:gap-x-3 ${index === results.length - 1 && "rounded-b-2xl border-b-0"} ${index === 0 && "rounded-t-2xl"} hover:bg-gray-200`}
+                    >
+                      <FaSearch />
+                      <p className="text-xs md:text-sm">
+                        {isMobile && laptopName.length > 50
+                          ? `${laptopName.slice(0, 50)}...`
+                          : laptopName}
+                      </p>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
           <div className="mr-2 flex items-center space-x-2">
-            <Link
+            {/* <Link
               to="/account"
               className="flex items-center space-x-1 text-blue-main"
             >
               <img src={user} alt="user" className="max-md:hidden md:h-8" />
               <span className="max-md:hidden">account</span>
-            </Link>
+            </Link> */}
             <Link
               to="/cart"
               className="flex items-center space-x-1 text-blue-main"
@@ -73,16 +143,14 @@ const NavigationBar = () => {
           </div>
         </div>
 
-        <div className="mx-auto flex justify-between border-t border-blue-main px-[15%] pt-2 text-blue-main max-md:hidden">
-          <Link to="/">Shop by category</Link>
+        <div className="border-t border-blue-main px-[15%] pt-2 text-blue-main max-md:hidden">
+          <div className="mx-auto flex w-1/2 justify-between">
+            <Link to="/search">All laptops</Link>
 
-          <Link to="/">Brands</Link>
+            <Link to="/search/categories">Shop by category</Link>
 
-          <Link to="/">Accesories</Link>
-
-          <Link to="/">Sale & Offers</Link>
-
-          <Link to="/">Costumer Service</Link>
+            <Link to="/search/brands">Brands</Link>
+          </div>
         </div>
       </nav>
     </header>
