@@ -482,7 +482,7 @@ const Search = () => {
                 return (
                   <div key={laptopName} className="border-b-2 border-black p-3">
                     <Link
-                      to={`${id}/${configuration_id}`}
+                      to={`/laptop/${id}/${configuration_id}`}
                       className="flex gap-x-4"
                     >
                       <div>
