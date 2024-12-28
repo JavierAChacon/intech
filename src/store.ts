@@ -16,6 +16,26 @@ interface CartState {
   removeItem: (id: string) => void
 }
 
+interface Configuration {
+  id: string
+  configuration_id: string
+  brand: string
+  model: string
+  category: "Student" | "Office" | "Creative" | "Gaming"
+  graphic_card: string
+  processor: string
+  ram: string
+  screen: string
+  storage: string
+  price: number
+  image_url: string
+}
+
+interface ConfigurationsState {
+  configurations: Configuration[]
+  setConfigurations: (configurations: Configuration[]) => void
+}
+
 const useCartStore = create<CartState>()(
   persist(
     (set) => ({
@@ -52,4 +72,16 @@ const useCartStore = create<CartState>()(
   )
 )
 
-export default useCartStore
+const useConfigurationsStore = create<ConfigurationsState>()(
+  persist(
+    (set) => ({
+      configurations: [],
+      setConfigurations: (configurations) => set({ configurations })
+    }),
+    {
+      name: "configurations-storage"
+    }
+  )
+)
+
+export { useCartStore, useConfigurationsStore }
