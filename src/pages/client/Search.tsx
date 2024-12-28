@@ -18,6 +18,14 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious
+} from "@/components/ui/pagination"
 import { Link } from "react-router-dom"
 import { useCartStore, useConfigurationsStore } from "@/store"
 import { useToast } from "@/hooks/use-toast"
@@ -267,6 +275,10 @@ const Search = () => {
     sortOrder
   ])
 
+  const itemsPerPage = 5
+  const [page, setPage] = useState(0)
+  const maxPages = Math.ceil(filteredLaptops.length / itemsPerPage)
+
   return (
     <div className="flex flex-col gap-x-4 p-4 font-baloo lg:flex-row">
       <div className="no-scrollbar flex gap-4 overflow-x-scroll lg:hidden">
@@ -450,74 +462,76 @@ const Search = () => {
       <div className="flex flex-1 flex-col gap-y-6">
         {configurations.length > 0 ? (
           filteredLaptops.length > 0 ? (
-            filteredLaptops.map((laptop) => {
-              const {
-                image_url,
-                brand,
-                model,
-                price,
-                id,
-                screen,
-                processor,
-                ram,
-                storage,
-                configuration_id
-              } = laptop
-              const laptopName = `${brand} ${model} - ${screen}" - ${processor} with ${ram} Memory - ${storage}`
+            filteredLaptops
+              .slice(page * itemsPerPage, (page + 1) * itemsPerPage)
+              .map((laptop) => {
+                const {
+                  image_url,
+                  brand,
+                  model,
+                  price,
+                  id,
+                  screen,
+                  processor,
+                  ram,
+                  storage,
+                  configuration_id
+                } = laptop
+                const laptopName = `${brand} ${model} - ${screen}" - ${processor} with ${ram} Memory - ${storage}`
 
-              return (
-                <div key={laptopName} className="border-b-2 border-black p-3">
-                  <Link
-                    to={`${id}/${configuration_id}`}
-                    className="flex gap-x-4"
-                  >
-                    <div>
-                      <img
-                        src={image_url}
-                        alt={laptopName}
-                        className="w-96 lg:w-40"
-                      />
-                    </div>
-
-                    <div className="flex flex-col justify-between lg:w-[35rem]">
-                      <h3 className="lg:text-justify lg:text-lg">
-                        {laptopName}
-                      </h3>
-
-                      <div className="w-fit space-y-1 lg:ml-auto lg:text-right">
-                        <span className="font-semibold lg:text-2xl">
-                          ${price.toFixed(2)}
-                        </span>
+                return (
+                  <div key={laptopName} className="border-b-2 border-black p-3">
+                    <Link
+                      to={`${id}/${configuration_id}`}
+                      className="flex gap-x-4"
+                    >
+                      <div>
+                        <img
+                          src={image_url}
+                          alt={laptopName}
+                          className="w-96 lg:w-40"
+                        />
                       </div>
-                    </div>
-                  </Link>
-                  <button
-                    onClick={() => {
-                      addItem({
-                        id: configuration_id,
-                        name: laptopName,
-                        price,
-                        url_photo: image_url,
-                        quantity: 1
-                      })
-                      toast({
-                        description: "Item added to cart",
-                        style: {
-                          backgroundColor: "#4caf50",
-                          color: "#fff",
-                          fontWeight: "bold",
-                          border: "none"
-                        },
-                        duration: 900
-                      })
-                    }}
-                    className="ml-32 mt-2 block rounded-lg bg-orange-main px-2 py-1 text-white lg:ml-[40rem]"
-                  >
-                    Add to cart
-                  </button>
-                </div>
-              )
-            })
+
+                      <div className="flex flex-col justify-between lg:w-[35rem]">
+                        <h3 className="lg:text-justify lg:text-lg">
+                          {laptopName}
+                        </h3>
+
+                        <div className="w-fit space-y-1 lg:ml-auto lg:text-right">
+                          <span className="font-semibold lg:text-2xl">
+                            ${price.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        addItem({
+                          id: configuration_id,
+                          name: laptopName,
+                          price,
+                          url_photo: image_url,
+                          quantity: 1
+                        })
+                        toast({
+                          description: "Item added to cart",
+                          style: {
+                            backgroundColor: "#4caf50",
+                            color: "#fff",
+                            fontWeight: "bold",
+                            border: "none"
+                          },
+                          duration: 900
+                        })
+                      }}
+                      className="ml-32 mt-2 block rounded-lg bg-orange-main px-2 py-1 text-white lg:ml-[40rem]"
+                    >
+                      Add to cart
+                    </button>
+                  </div>
+                )
+              })
           ) : (
             <div className="mt-2 text-center text-lg">
               No laptops found matching the selected filters.
@@ -541,6 +555,81 @@ const Search = () => {
             ))}
           </div>
         )}
+        <Pagination>
+          <PaginationContent>
+            {/* Botón Previous */}
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => {
+                  setPage(page - 1)
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }}
+                aria-disabled={page <= 0}
+                tabIndex={page <= 0 ? -1 : undefined}
+                className={`${
+                  page <= 0 ? "pointer-events-none opacity-50" : ""
+                } px-2 py-1`}
+              >
+                Previous
+              </PaginationPrevious>
+            </PaginationItem>
+
+            {[...Array(maxPages)].map((_, index) => {
+              const isVisible =
+                index === 0 ||
+                index === maxPages - 1 ||
+                (index >= page - 1 && index <= page + 1)
+
+              if (isVisible) {
+                return (
+                  <PaginationItem key={index}>
+                    <button
+                      onClick={() => {
+                        setPage(index)
+                        window.scrollTo({ top: 0, behavior: "smooth" })
+                      }}
+                      className={`${
+                        page === index ? "bg-blue-main text-white" : ""
+                      } px-2 py-1`}
+                    >
+                      {index + 1}
+                    </button>
+                  </PaginationItem>
+                )
+              }
+
+              const isEllipsisBefore = index === page - 2 && page > 2
+              const isEllipsisAfter = index === page + 2 && page < maxPages - 3
+
+              if (isEllipsisBefore || isEllipsisAfter) {
+                return (
+                  <PaginationItem key={`ellipsis-${index}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )
+              }
+
+              return null
+            })}
+
+            {/* Botón Next */}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => {
+                  setPage(page + 1)
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }}
+                aria-disabled={page >= maxPages - 1}
+                tabIndex={page >= maxPages - 1 ? -1 : undefined}
+                className={`${
+                  page >= maxPages - 1 ? "pointer-events-none opacity-50" : ""
+                } px-2 py-1`}
+              >
+                Next
+              </PaginationNext>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   )
