@@ -10,6 +10,7 @@ import laptop_1 from "../../assets/images/laptop_1.png"
 import robot from "../../assets/icons/robot.svg"
 import laptop_2 from "../../assets/images/laptop_2.png"
 import plastic_card from "../../assets/images/plastic_card.png"
+import fetchConfigurations from "@/utils/fetchConfigurations"
 
 export interface Laptop {
   id: string
@@ -21,6 +22,11 @@ export interface Laptop {
 
 const Home = () => {
   const [laptops, setLaptops] = useState<Laptop[]>([])
+  const configurations = [
+    "7f602eec-7a49-4da6-84d8-d3b3ff08d648",
+    "0e893a97-f9bf-48b3-9435-41acfc5a580d",
+    "c949da19-b2e8-4dc6-b0da-68c1200af37f"
+  ]
   const isMobile = useIsMobile()
 
   const deliveries = [
@@ -80,6 +86,7 @@ const Home = () => {
     }
 
     fetchLaptops()
+    fetchConfigurations()
   }, [])
 
   return (
@@ -115,9 +122,9 @@ const Home = () => {
 
           <div className="no-scrollbar mb-4 flex gap-x-4 overflow-scroll px-[5%] md:mb-0">
             {laptops.length > 0 ? (
-              laptops.map((laptop) => (
+              laptops.map((laptop, index) => (
                 <Link
-                  to={`/laptop/${laptop.id}`}
+                  to={`/laptop/${laptop.id}/${configurations[index]}`}
                   className="flex h-40 w-44 flex-col items-center justify-center rounded-2xl bg-white text-center"
                   key={laptop.id}
                 >
@@ -175,12 +182,9 @@ const Home = () => {
           </div>
 
           <div className="flex-1">
-            <Link
-              to="/"
-              className="mx-auto my-4 rounded-2xl bg-orange-main px-1 py-2 text-white md:min-w-max md:bg-white md:font-bold md:text-black lg:text-3xl"
-            >
+            <h3 className="mx-auto my-4 px-1 py-2 text-xl font-bold md:min-w-max md:bg-white md:font-bold md:text-black lg:text-3xl">
               Shop with an expert
-            </Link>
+            </h3>
 
             <p className="mt-3 text-left lg:text-xl">
               Get personalized advice from our tech experts to make your
