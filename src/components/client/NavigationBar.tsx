@@ -28,6 +28,25 @@ interface Configuration {
   price: number
 }
 
+const links = [
+  {
+    to: "/",
+    text: "Home"
+  },
+  {
+    to: "/search",
+    text: "All laptops"
+  },
+  {
+    to: "/search/categories",
+    text: "Shop by category"
+  },
+  {
+    to: "/search/brands",
+    text: "Brands"
+  }
+]
+
 type SearchSchemaType = z.infer<typeof SearchSchema>
 
 const NavigationBar = () => {
@@ -117,13 +136,6 @@ const NavigationBar = () => {
           </div>
 
           <div className="mr-2 flex items-center space-x-2">
-            {/* <Link
-              to="/account"
-              className="flex items-center space-x-1 text-blue-main"
-            >
-              <img src={user} alt="user" className="max-md:hidden md:h-8" />
-              <span className="max-md:hidden">account</span>
-            </Link> */}
             <Link
               to="/cart"
               className="flex items-center space-x-1 text-blue-main"
@@ -132,11 +144,11 @@ const NavigationBar = () => {
               <span className="max-md:hidden">cart</span>
             </Link>
 
-            <div className="md:hidden">
+            <div className={`relative z-20 md:hidden`}>
               <Hamburger
                 toggled={isOpen}
                 toggle={setIsOpen}
-                color="#223fc7"
+                color={isOpen ? "white" : "#223fc7"}
                 size={27}
               />
             </div>
@@ -145,12 +157,30 @@ const NavigationBar = () => {
 
         <div className="border-t border-blue-main px-[15%] pt-2 text-blue-main max-md:hidden">
           <div className="mx-auto flex w-1/2 justify-between">
-            <Link to="/search">All laptops</Link>
-
-            <Link to="/search/categories">Shop by category</Link>
-
-            <Link to="/search/brands">Brands</Link>
+            {links.map((link) => (
+              <Link to={link.to} key={link.to}>
+                {link.text}
+              </Link>
+            ))}
           </div>
+        </div>
+
+        <div
+          className={`${isOpen ? "right-0" : "-right-full"} absolute top-0 z-10 flex h-dvh w-full flex-col items-center justify-center bg-blue-main text-white transition-all duration-300 ease-in-out md:hidden`}
+        >
+          <ul className="space-y-5">
+            {links.map((link) => (
+              <li onClick={() => setIsOpen(false)} key={link.to}>
+                <Link
+                  to={link.to}
+                  key={link.to}
+                  className="text-2xl font-semibold"
+                >
+                  {link.text}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </nav>
     </header>
