@@ -203,7 +203,7 @@ const Home = () => {
           </div>
 
           <button className="mx-auto my-4 mb-2 mt-6 block w-fit rounded-2xl bg-orange-main px-5 py-2 text-lg text-white lg:text-xl">
-            <Link to="/">Save big today!</Link>
+            <Link to="/search">Save big today!</Link>
           </button>
         </div>
 
