@@ -144,7 +144,9 @@ const NavigationBar = () => {
               <span className="max-md:hidden">cart</span>
             </Link>
 
-            <div className={`relative z-20 md:hidden`}>
+            <div
+              className={`${isOpen ? "fixed right-2 top-2 z-20 lg:hidden" : ""}`}
+            >
               <Hamburger
                 toggled={isOpen}
                 toggle={setIsOpen}
@@ -155,7 +157,7 @@ const NavigationBar = () => {
           </div>
         </div>
 
-        <div className="border-t border-blue-main px-[15%] pt-2 text-blue-main max-md:hidden">
+        <div className="border-t border-blue-main px-[15%] pt-2 text-blue-main max-lg:hidden">
           <div className="mx-auto flex w-1/2 justify-between">
             {links.map((link) => (
               <Link to={link.to} key={link.to}>
@@ -166,7 +168,7 @@ const NavigationBar = () => {
         </div>
 
         <div
-          className={`${isOpen ? "right-0" : "-right-full"} absolute top-0 z-10 flex h-dvh w-full flex-col items-center justify-center bg-blue-main text-white transition-all duration-300 ease-in-out md:hidden`}
+          className={`${isOpen ? "right-0" : "-right-full"} transition-right fixed top-0 z-10 flex h-dvh w-full flex-col items-center justify-center bg-blue-main text-white duration-300`}
         >
           <ul className="space-y-5">
             {links.map((link) => (

@@ -280,7 +280,7 @@ const Search = () => {
   const maxPages = Math.ceil(filteredLaptops.length / itemsPerPage)
 
   return (
-    <div className="flex flex-col gap-x-4 p-4 font-baloo lg:flex-row">
+    <div className="flex flex-col gap-x-4 p-4 font-baloo md:items-center lg:flex-row lg:items-start">
       <div className="no-scrollbar flex gap-4 overflow-x-scroll lg:hidden">
         {filterConfigs.map((filter) => {
           const {
