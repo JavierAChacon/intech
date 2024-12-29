@@ -145,7 +145,7 @@ const NavigationBar = () => {
             </Link>
 
             <div
-              className={`${isOpen ? "fixed right-2 top-2 z-20 lg:hidden" : ""}`}
+              className={`${isOpen ? "fixed right-2 top-2 z-20 lg:hidden" : "block"} lg:hidden`}
             >
               <Hamburger
                 toggled={isOpen}
